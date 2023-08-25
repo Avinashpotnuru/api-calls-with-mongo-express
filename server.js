@@ -4,15 +4,13 @@ app.use(express.json());
 
 const mongoose = require("mongoose");
 const Todo = require("./model");
+const Contact = require("./contact");
 
 mongoose
-  .connect(
-    "mongodb+srv://avinash:LE9e9K7eKwrmFGyA@cluster0.istpydn.mongodb.net/todos-app",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect("mongodb://localhost:27017", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("connect"))
   .catch((err) => console.log(err));
 
@@ -53,5 +51,40 @@ app.get("/deletetodo/:id", async (req, res) => {
 });
 
 // app.delete("/todo/:_id",);
+
+//add contact
+
+app.post("/addcontact", async (req, res) => {
+  const { name, number, address } = req.body;
+  try {
+    const contact = new Contact({ name, number, address });
+    await contact.save();
+    res.json(await Contact.find({}));
+
+    res.json();
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//get contact details
+
+app.get("/contact", async (req, res) => {
+  try {
+    res.json(await Contact.find());
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.get("/user/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const getSingleUser = await Contact.findById(id);
+    res.json(getSingleUser);
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 app.listen(3000, () => console.log("server start"));
